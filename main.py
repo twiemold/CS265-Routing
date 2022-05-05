@@ -1,16 +1,33 @@
-# This is a sample Python script.
+"""
+Thomas Wiemold
+5/5/2022
+CS265A
+Programming Assignment #2
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+Per Instructions:
+When integrated with other services, your application will query the
+network controller for its topology (RESTfully), compute forwarding
+tables to support optimal routing between three hosts, and then deploy
+the forwarding tables to the network via the controller.
+
+"""
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+def deploy_tables():
+    # deploy the forwarding tables to the network via the controller
+    pass
 
 
-# Press the green button in the gutter to run the script.
+def comp_tables():
+    # compute forwarding
+    # tables to support optimal routing between three hosts
+    pass
+
+
+def query_network():
+    # query the network controller for its topology (RESTfully)
+    pass
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    query_network()
