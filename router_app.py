@@ -10,6 +10,9 @@ network controller for its topology (RESTfully), compute forwarding
 tables to support optimal routing between three hosts, and then deploy
 the forwarding tables to the network via the controller.
 
+Link to RFC:
+http://ceskalka.w3.uvm.edu/265/sdn-assignment/
+
 """
 
 
