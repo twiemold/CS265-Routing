@@ -94,7 +94,6 @@ def comp_paths(topo, initial_node):
     # tables to support optimal routing between three hosts
     paths, shortest_paths, \
         previous_nodes, hosts, unvisited_nodes = initialize_paths(topo)
-    switches = list(paths.keys() - hosts)
     if initial_node == -1:
         start_node = unvisited_nodes[0]
     else:
@@ -114,7 +113,7 @@ def comp_paths(topo, initial_node):
                 shortest_paths[neighbor[0]] = tentative_value
                 previous_nodes[neighbor[0]] = (current_min, neighbor[1])
         unvisited_nodes.remove(current_min)
-    return previous_nodes, shortest_paths, switches, hosts
+    return previous_nodes, shortest_paths, hosts
 
 
 def query_network(arguments):
@@ -136,11 +135,11 @@ def main():
     if topo == 8:
         print("Error querying network, exiting...")
         return 8
-    previous_nodes, shortest_paths, switches, hosts = comp_paths(topo, -1)
+    previous_nodes, shortest_paths, hosts = comp_paths(topo, -1)
     forwarding_tables = {"table entries": []}
     node_tables = {}
     for host in hosts:
-        previous_nodes, shortest_paths, switches, hosts = comp_paths(topo, host)
+        previous_nodes, shortest_paths, hosts = comp_paths(topo, host)
         node_tables[host] = previous_nodes
     for i in range(len(hosts)):
         if i == len(hosts) - 1:
