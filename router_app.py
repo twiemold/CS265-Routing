@@ -28,8 +28,11 @@ SOCKET = ":2222"
 
 def deploy_tables(table, arguments):
     response = req.post(f'http://{arguments[0]}{SOCKET}/set_tables/{arguments[1]}',
-                        table,
+                        json=table,
                         timeout=10)
+    json_response = response.json()
+    for entry in json_response["hops"]:
+        print(entry)
     if response.status_code != req.codes.ok:
         response.raise_for_status()
         return 8
@@ -62,7 +65,7 @@ def find_path(dest, previous_nodes, start_node):
 def create_tables(dest, previous_nodes, start_node, tables):
     path = find_path(dest, previous_nodes, start_node)
     for node in path:
-        tables["table entries"].append(create_entry(node, dest))
+        tables["table_entries"].append(create_entry(node, dest))
     return tables
 
 
@@ -94,6 +97,7 @@ def comp_paths(topo, initial_node):
     # tables to support optimal routing between three hosts
     paths, shortest_paths, \
         previous_nodes, hosts, unvisited_nodes = initialize_paths(topo)
+    switches = list(paths.keys() - hosts)
     if initial_node == -1:
         start_node = unvisited_nodes[0]
     else:
@@ -113,7 +117,7 @@ def comp_paths(topo, initial_node):
                 shortest_paths[neighbor[0]] = tentative_value
                 previous_nodes[neighbor[0]] = (current_min, neighbor[1])
         unvisited_nodes.remove(current_min)
-    return previous_nodes, shortest_paths, hosts
+    return previous_nodes, shortest_paths, switches, hosts
 
 
 def query_network(arguments):
@@ -135,17 +139,18 @@ def main():
     if topo == 8:
         print("Error querying network, exiting...")
         return 8
-    previous_nodes, shortest_paths, hosts = comp_paths(topo, -1)
-    forwarding_tables = {"table entries": []}
+    previous_nodes, shortest_paths, switches, hosts = comp_paths(topo, -1)
+    forwarding_tables = {"table_entries": []}
     node_tables = {}
     for host in hosts:
-        previous_nodes, shortest_paths, hosts = comp_paths(topo, host)
+        previous_nodes, shortest_paths, switches, hosts = comp_paths(topo, host)
         node_tables[host] = previous_nodes
     for i in range(len(hosts)):
-        if i == len(hosts) - 1:
-            forwarding_tables = create_tables(hosts[i], node_tables[hosts[0]], hosts[0], forwarding_tables)
-        else:
-            forwarding_tables = create_tables(hosts[i], node_tables[hosts[i+1]], hosts[i+1], forwarding_tables)
+        for j in range(len(hosts)):
+            if i == j:
+                pass
+            else:
+                forwarding_tables = create_tables(hosts[i], node_tables[hosts[j]], hosts[j], forwarding_tables)
 
     deploy_result = deploy_tables(forwarding_tables, arguments)
     if deploy_result == 8:
@@ -154,7 +159,7 @@ def main():
     else:
         print("Successfully deployed optimal routing tables")
         print("Table output:")
-        for entry in forwarding_tables["table entries"]:
+        for entry in forwarding_tables["table_entries"]:
             print(entry)
 
 
